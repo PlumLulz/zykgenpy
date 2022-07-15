@@ -93,7 +93,7 @@ def zykgen_wpa(serial, passlength, cocktail):
 
 parser = argparse.ArgumentParser(description='Zykgen WPA keygen. (Zyxel VMG8823-B50B)')
 parser.add_argument('serial', help='Serial Number')
-parser.add_argument('cocktail', help='Cocktail to use for keygen. m = Mojito, n = Negroni, c = Cosmopolitan, s = Screw Driver, g = Gin N\' Tonic')
+parser.add_argument('cocktail', help='Cocktail to use for keygen. m = Mojito, n = Negroni, c = Cosmopolitan, s = Screw Driver, g = Gin N\' Juice')
 parser.add_argument('-length', help='Password length, default is 10.', default=10, type=int)
 args = parser.parse_args()
 
