@@ -11,7 +11,7 @@ def pick(haystack, charset, needle, base, max, v):
     letter = ''
     while i < max and terminate == 0:
         if haystack[i] == chr(int(needle)):
-            base = base + i + 1
+            base = base + i
             letter = charset[base % v]
             terminate = 1
         i = i + 1
@@ -28,8 +28,6 @@ def cocktail(arg):
         return 3
     elif arg == "s":
         return 4
-    elif arg == "g":
-        return 5
     else:
         return False
 
@@ -55,13 +53,6 @@ def zykgen_wpa(serial, passlength, cocktail):
         v = 24
     # Screw driver
     if cocktail == 4:
-        haystack = '125680BDGILOQSZ3478ACEFHKJMNPRTUVWXY125680BDGILOQSZ3478ACEFHKJMNPRTUVWXY' # invalid+valid chars
-        charset = '3479ACEFHJKMNPRTUVWXY3479ACEFHJKMNPRTUVWXY' # valid chars
-        max_value = 15 # unused chars (36-v)
-        v = 21 # valid chars
-
-    # Gin N' Juice
-    if cocktail == 5:
         haystack = 'B8G6I1L0OQDS5Z23479ACEFHJKMNPRTUVWXY' # invalid+valid chars
         charset = '3479ACEFHJKMNPRTUVWXY' # valid chars
         max_value = 15 # unused chars (36-v)
@@ -93,12 +84,11 @@ def zykgen_wpa(serial, passlength, cocktail):
 
 parser = argparse.ArgumentParser(description='Zykgen WPA keygen. (Zyxel VMG8823-B50B)')
 parser.add_argument('serial', help='Serial Number')
-parser.add_argument('cocktail', help='Cocktail to use for keygen. m = Mojito, n = Negroni, c = Cosmopolitan, s = Screw Driver, g = Gin N\' Juice')
+parser.add_argument('cocktail', help='Cocktail to use for keygen. m = Mojito, n = Negroni, c = Cosmopolitan, s = Screw Driver')
 parser.add_argument('-length', help='Password length, default is 10.', default=10, type=int)
 args = parser.parse_args()
 
 if cocktail(args.cocktail):
     zykgen_wpa(args.serial, args.length, cocktail(args.cocktail))
 else:
-    print("Invalid cocktail. Options are m, n, c, s or g, use -h for more help.")
-
+    print("Invalid cocktail. Options are m, n, c, or s. use -h for more help.")
