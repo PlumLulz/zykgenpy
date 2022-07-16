@@ -10,7 +10,7 @@ def pick(haystack, charset, needle, base, max, v):
     terminate = 0
     letter = ''
     while i < max and terminate == 0:
-        if haystack[i+1] == chr(int(needle)):
+        if haystack[i] == chr(int(needle)):
             base = base + i + 1
             letter = charset[base % v]
             terminate = 1
