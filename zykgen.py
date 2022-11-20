@@ -36,7 +36,7 @@ def cocktail(arg):
         return False
 
 
-def zykgen_wpa(serial, passlength, cocktail):
+def zykgen_wpa(serial, passlength, cocktail, algorithm):
     # Cosmopolitan
     if cocktail == 1:
         haystack = '1234567890ilosabcdefghjkmnpqrtuvwxyz12560IOSZ3478ABCDEFGHJKLMNPQRTUVWXY125690IOSVWZ3478ABCDEFGHJKLMNPQRTUXY'
@@ -76,24 +76,32 @@ def zykgen_wpa(serial, passlength, cocktail):
         passlength = 10
 
     serial = serial.upper()
-    md5 = hashlib.md5()
-    md5.update(serial.encode())
+    if algorithm == 1:
+        hashh = hashlib.md5()
+    elif algorithm == 2:
+        hashh = hashlib.sha256()
+
+    hashh.update(serial.encode())
     # Append salt
-    salted = "%sPSK_ra0" % (md5.hexdigest())
-    newmd5 = hashlib.md5()
-    newmd5.update(salted.encode())
-    # Do some math with the raw MD5 digest to get the base
-    base = newmd5.digest()[0] * 256 + newmd5.digest()[1]
+    if algorithm == 1:
+        salted = "%sPSK_ra0" % (hashh.hexdigest())
+        newhashh = hashlib.md5()
+    elif algorithm == 2:
+        salted = "%sPSK_ra0" % (hashh.hexdigest()[0:32].lower())
+        newhashh = hashlib.sha256()
+
+    newhashh.update(salted.encode())
+    # Do some math with the raw hash digest to get the base
+    base = newhashh.digest()[0] * 256 + newhashh.digest()[1]
     # Convert to binary and flip
     binary = bin(base)[2:].zfill(16)[::-1]
-
 
     key = ""
     for i in range(passlength):
         if int(binary[i]) == 1:
-            c = newmd5.digest()[i] % 26 + 65
+            c = newhashh.digest()[i] % 26 + 65
         else:
-            c = newmd5.digest()[i] % 10 + 48
+            c = newhashh.digest()[i] % 10 + 48
         letter = pick(haystack, charset, c, base, max_value, v)
         key += letter
     print (key)
@@ -102,10 +110,11 @@ def zykgen_wpa(serial, passlength, cocktail):
 parser = argparse.ArgumentParser(description='Zykgen WPA keygen. (Zyxel VMG8823-B50B)')
 parser.add_argument('serial', help='Serial Number')
 parser.add_argument('cocktail', help='Cocktail to use for keygen. m = Mojito, n = Negroni, c = Cosmopolitan, s = Screw Driver, g = Gin and Juice, p = Pina Colada')
+parser.add_argument('-algorithm', help='Algorithm to use. 1 = MD5, 2 = SHA256', default=1, type=int, choices={1,2})
 parser.add_argument('-length', help='Password length, default is 10.', default=10, type=int)
 args = parser.parse_args()
 
 if cocktail(args.cocktail):
-    zykgen_wpa(args.serial, args.length, cocktail(args.cocktail))
+    zykgen_wpa(args.serial, args.length, cocktail(args.cocktail), args.algorithm)
 else:
     print("Invalid cocktail. Options are m, n, c, s, g, or p. use -h for more help.")
